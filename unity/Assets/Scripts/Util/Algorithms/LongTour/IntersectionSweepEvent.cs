@@ -1,19 +1,29 @@
 ﻿using System;
 using UnityEngine;
 using Util.Algorithms;
-using Util.Algorithms.Polygon;
 
 namespace Assets.Scripts.Util.Algorithms.LongTour
 {
-    class IntersectionSweepEvent : ISweepEvent<StatusItem>, IComparable<IntersectionSweepEvent>, IEquatable<IntersectionSweepEvent>
+    public class IntersectionSweepEvent : ISweepEvent<IntersectionStatusItem>, IComparable<IntersectionSweepEvent>, IEquatable<IntersectionSweepEvent>
     {
-        public Vector2 Pos => throw new NotImplementedException();
+        public IntersectionSweepEvent(Vector2 pos, bool isStart, bool isEnd)
+        {
+            Pos = pos;
+            IsStart = isStart;
+            IsEnd = isEnd;
+        }
+        public Vector2 Pos { get; set; }
 
-        public StatusItem StatusItem => throw new NotImplementedException();
+        public IntersectionStatusItem StatusItem { get; set; }
 
-        public bool IsStart => throw new NotImplementedException();
+        public bool IsStart { get; set; }
 
-        public bool IsEnd => throw new NotImplementedException();
+        public bool IsEnd{ get; set; }
+
+        public bool IsIntersection
+        {
+            get { return !IsStart && !IsEnd; }
+        }
 
         public int CompareTo(IntersectionSweepEvent other)
         {
