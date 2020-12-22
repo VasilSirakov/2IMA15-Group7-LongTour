@@ -1,22 +1,25 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using Util.Geometry;
-
-public class TourSegment : MonoBehaviour
+﻿namespace LongTour
 {
-    public LineSegment Segment { get; set; }
-    private TourController m_gameController;
+    using System.Collections;
+    using System.Collections.Generic;
+    using UnityEngine;
+    using Util.Geometry;
 
-    void Awake()
+    public class TourSegment : MonoBehaviour
     {
-        m_gameController = FindObjectOfType<TourController>();
-    }
+        public LineSegment Segment { get; set; }
+        private TourController m_gameController;
 
-    void OnMouseUpAsButton()
-    {
-        //destroy the road object
-        m_gameController.RemoveSegment(this);
-        Destroy(gameObject);
+        void Awake()
+        {
+            m_gameController = FindObjectOfType<TourController>();
+        }
+
+        void OnMouseUpAsButton()
+        {
+            //destroy the road object
+            m_gameController.RemoveSegment(this);
+            Destroy(gameObject);
+        }
     }
 }

@@ -148,8 +148,12 @@ MonoBehaviour:
   m_line: {fileID: 826534948572647600, guid: 15b8c7f4bdd24c446970bb1c8341ef37, type: 3}
   m_roadMeshPrefab: {fileID: 4893322794614436188, guid: 3e1f8c1ef61efe64ba1270017bdca4a3,
     type: 3}
+  m_pointPrefab: {fileID: 2294916941558829680, guid: d7a6d2174ae363649a9526f720b9a9ce,
+    type: 3}
   m_advanceButton: {fileID: 5703984767813498912, guid: 81b43a89367080847b2673a0eb10b5be,
     type: 3}
+  m_levels: []
+  m_victoryScene: tourVictory
 --- !u!1001 &318220171
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1186,6 +1190,26 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 2113669465}
     m_Modifications:
+    - target: {fileID: 5703984767356096076, guid: 81b43a89367080847b2673a0eb10b5be,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_StringArgument
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 5703984767356096076, guid: 81b43a89367080847b2673a0eb10b5be,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 291285743}
+    - target: {fileID: 5703984767356096076, guid: 81b43a89367080847b2673a0eb10b5be,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: AdvanceLevel
+      objectReference: {fileID: 0}
+    - target: {fileID: 5703984767356096076, guid: 81b43a89367080847b2673a0eb10b5be,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5703984767813498926, guid: 81b43a89367080847b2673a0eb10b5be,
         type: 3}
       propertyPath: m_Name

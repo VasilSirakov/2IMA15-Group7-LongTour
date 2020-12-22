@@ -1,6 +1,7 @@
 ﻿using ArtGallery;
 using Divide;
 using KingsTaxes;
+using LongTour;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -50,6 +51,10 @@ public class LoadLevelEditor : ScriptedImporter
         else if (name.StartsWith("hullLevel"))
         {
             obj = LoadHullLevel(fileSelected, name);
+        }
+        else if (name.StartsWith("tourLevel"))
+        {
+            obj = LoadTourLevel(fileSelected, name);
         }
         else
         {
@@ -418,4 +423,29 @@ public class LoadLevelEditor : ScriptedImporter
                 (p[1] - (rect.yMin + rect.height / 2f)) * scale))
             .ToList();
     }
+
+    private UnityEngine.Object LoadTourLevel(XElement fileSelected, string name)
+    {
+        //create the output scriptable object
+        var asset = ScriptableObject.CreateInstance<TourLevel>();
+
+        //retrieve page data from .ipe file
+        var items = fileSelected.Descendants("page").First().Descendants("use");
+
+        //get marker data into respective vector list
+        asset.Points.AddRange(GetMarkers(items, "disk"));
+
+        //normalize coordinates
+        var rect = BoundingBoxComputer.FromPoints(asset.Points);
+        Normalize(rect, ktSIZE, asset.Points);
+
+        //give warning if no relevant data found
+        if (asset.Points.Count == 0)
+        {
+            EditorUtility.DisplayDialog("Warning", "File does not contain any chests (disks).", "OK");
+        }
+
+        return asset;
+    }
+
 }

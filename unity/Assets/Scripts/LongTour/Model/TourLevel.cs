@@ -1,18 +1,16 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-public class TourLevel : MonoBehaviour
+﻿namespace LongTour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    using System.Collections.Generic;
+    using UnityEngine;
 
-    // Update is called once per frame
-    void Update()
+    ///<summary>
+    /// Data container for long tour level, containing the point set
+    /// </summary>
+    [CreateAssetMenu(fileName = "tourLevelNew", menuName = "Levels/Long Tour Level")]
+    public class TourLevel : ScriptableObject
     {
-        
+        [Header("Tour Points")]
+        public List<Vector2> Points = new List<Vector2>();
     }
 }
+
