@@ -13,13 +13,13 @@ MonoBehaviour:
   m_Name: tourLevelNew
   m_EditorClassIdentifier: 
   Points:
-  - {x: -8, y: 8}
+  - {x: 0, y: 0}
   - {x: -6, y: -6}
   - {x: -4, y: 4}
   - {x: -2, y: -2}
   - {x: 0, y: 0}
-  - {x: 2, y: -2}
-  - {x: 4, y: 4}
-  - {x: 6, y: -6}
-  - {x: 8, y: 8}
-  - {x: 10, y: -10}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}

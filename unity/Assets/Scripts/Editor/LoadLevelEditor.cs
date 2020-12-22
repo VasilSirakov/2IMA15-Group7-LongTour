@@ -329,6 +329,36 @@ public class LoadLevelEditor : ScriptedImporter
     }
 
     /// <summary>
+    /// Loads a LongTour level.
+    /// </summary>
+    /// <param name="fileSelected"></param>
+    /// <param name="name"></param>
+    /// <returns></returns>
+    private UnityEngine.Object LoadTourLevel(XElement fileSelected, string name)
+    {
+        // create the output scriptable object
+        var asset = ScriptableObject.CreateInstance<TourLevel>();
+
+        // retrieve page data from .ipe file
+        var items = fileSelected.Descendants("page").First().Descendants("use");
+
+        // get marker data into respective vector list
+        asset.Points.AddRange(GetMarkers(items, "disk"));
+
+        // normalize coordinates
+        var rect = BoundingBoxComputer.FromPoints(asset.Points);
+        asset.Points = Normalize(rect, ktSIZE, asset.Points);
+
+        // give warning if no relevant data found
+        if (asset.Points.Count == 0)
+        {
+            EditorUtility.DisplayDialog("Warning", "File does not contain any chests (disks and/or squares).", "OK");
+        }
+
+        return asset;
+    }
+
+    /// <summary>
     /// Retrieve a vector list for all markers elements with given name
     /// </summary>
     /// <param name="items"></param>
@@ -422,30 +452,6 @@ public class LoadLevelEditor : ScriptedImporter
                 (p[0] - (rect.xMin + rect.width / 2f)) * scale,
                 (p[1] - (rect.yMin + rect.height / 2f)) * scale))
             .ToList();
-    }
-
-    private UnityEngine.Object LoadTourLevel(XElement fileSelected, string name)
-    {
-        //create the output scriptable object
-        var asset = ScriptableObject.CreateInstance<TourLevel>();
-
-        //retrieve page data from .ipe file
-        var items = fileSelected.Descendants("page").First().Descendants("use");
-
-        //get marker data into respective vector list
-        asset.Points.AddRange(GetMarkers(items, "disk"));
-
-        //normalize coordinates
-        var rect = BoundingBoxComputer.FromPoints(asset.Points);
-        Normalize(rect, ktSIZE, asset.Points);
-
-        //give warning if no relevant data found
-        if (asset.Points.Count == 0)
-        {
-            EditorUtility.DisplayDialog("Warning", "File does not contain any chests (disks).", "OK");
-        }
-
-        return asset;
     }
 
 }
