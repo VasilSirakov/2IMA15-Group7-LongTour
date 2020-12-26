@@ -8,13 +8,29 @@ namespace Assets.Scripts.Util.Algorithms.LongTour
 {
     public class IntersectionSweepEvent : ISweepEvent<IntersectionStatusItem>, IComparable<IntersectionSweepEvent>, IEquatable<IntersectionSweepEvent>
     {
-        public IntersectionSweepEvent(Vector2 point, IntersectionSweepEvent otherEvent, bool isStart, bool isEnd)
+        public IntersectionSweepEvent(Vector2 point, bool isStart, bool isEnd, LineSegment segment,
+            IntersectionSweepEvent otherEvent)
         {
             Point = new Vector2D(point);
             IsStart = isStart;
             IsEnd = isEnd;
+            Segment = segment;
             OtherEvent = otherEvent;
         }
+
+        public IntersectionSweepEvent(Vector2 point, bool isStart, bool isEnd, LineSegment segment,
+             LineSegment otherSegment)
+        {
+            Point = new Vector2D(point);
+            IsStart = isStart;
+            IsEnd = isEnd;
+            Segment = segment;
+            OtherSegment = otherSegment;
+        }
+
+        public LineSegment Segment { get; set; }
+
+        public LineSegment OtherSegment { get; set; }  // use in intersection events
 
         public Vector2D Point { get; set; }
 
@@ -34,7 +50,7 @@ namespace Assets.Scripts.Util.Algorithms.LongTour
             get { return !IsStart && !IsEnd; }
         }
 
-        public IntersectionSweepEvent OtherEvent { get; set; }
+        public IntersectionSweepEvent OtherEvent { get; set; }  // other endpoint event
 
         public bool Below(Vector2D point)
         {

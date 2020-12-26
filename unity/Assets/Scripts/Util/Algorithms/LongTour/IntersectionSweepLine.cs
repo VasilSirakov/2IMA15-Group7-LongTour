@@ -12,13 +12,16 @@ namespace Util.Algorithms.LongTour
         where T : IComparable<T>, IEquatable<T>
     {
 
-        public void FindIntersection(IEnumerable<LineSegment> segments)
+        public Tuple<LineSegment, LineSegment> intersected;
+
+        public Tuple<LineSegment, LineSegment> FindIntersection(IEnumerable<LineSegment> segments)
         {
+            intersected = null;
             var sweepLine = new SweepLine<IntersectionSweepEvent, IntersectionStatusItem>();
             IEnumerable<E> events = CreateEvents(segments) as IEnumerable<E>;
             sweepLine.InitializeEvents(events);
             sweepLine.VerticalSweep(HandleEvent);
-            // TODO: return first intersection?
+            return intersected;
         }
 
         public void AddEvents(LineSegment segment, List<IntersectionSweepEvent> events)
@@ -26,8 +29,8 @@ namespace Util.Algorithms.LongTour
             Vector2 point1 = segment.Point1;
             Vector2 point2 = segment.Point2;
 
-            var ev1 = new IntersectionSweepEvent(point1, null, false, false);
-            var ev2 = new IntersectionSweepEvent(point2, ev1, false, false);
+            var ev1 = new IntersectionSweepEvent(point1, false, false, segment, null as IntersectionSweepEvent);
+            var ev2 = new IntersectionSweepEvent(point2, false, false, segment, ev1);
             ev1.OtherEvent = ev2;
 
             if (point1.Equals(point2))
@@ -69,17 +72,29 @@ namespace Util.Algorithms.LongTour
                 status.Insert(ev.StatusItem);
 
                 IntersectionStatusItem prev, next;
-                var prevFound = status.FindNextSmallest(ev.StatusItem, out prev);
-                var nextFound = status.FindNextBiggest(ev.StatusItem, out next);
+                bool prevFound = status.FindNextSmallest(ev.StatusItem, out prev);
+                bool nextFound = status.FindNextBiggest(ev.StatusItem, out next);
 
                 if (prevFound)
                 {
-                    // TODO: check for intersection
+                    LineSegment otherSegment = prev.SweepEvent.Segment;
+                    Vector2? intersection = ev.Segment.IntersectProper(otherSegment);
+                    if (intersection != null)
+                    {
+                        events.Insert(new IntersectionSweepEvent(intersection.Value, false, false,
+                            ev.Segment, otherSegment));
+                    }
                 }
 
                 if (nextFound)
                 {
-                    // TODO: check for intersection
+                    LineSegment otherSegment = next.SweepEvent.Segment;
+                    Vector2? intersection = ev.Segment.IntersectProper(otherSegment);
+                    if (intersection != null)
+                    {
+                        events.Insert(new IntersectionSweepEvent(intersection.Value, false, false,
+                            ev.Segment, otherSegment));
+                    }
                 }
             }
             else if (ev.IsEnd)
@@ -87,19 +102,29 @@ namespace Util.Algorithms.LongTour
                 ev = ev.OtherEvent;
 
                 IntersectionStatusItem prev, next;
-                var prevFound = status.FindNextSmallest(ev.StatusItem, out prev);
-                var nextFound = status.FindNextBiggest(ev.StatusItem, out next);
+                bool prevFound = status.FindNextSmallest(ev.StatusItem, out prev);
+                bool nextFound = status.FindNextBiggest(ev.StatusItem, out next);
 
                 status.Delete(ev.StatusItem);
 
                 if (nextFound && prevFound)
                 {
-                    // TODO: check for intersection
+                    LineSegment segment = prev.SweepEvent.Segment;
+                    LineSegment otherSegment = next.SweepEvent.Segment;
+                    Vector2? intersection = segment.IntersectProper(otherSegment);
+                    if (intersection != null)
+                    {
+                        events.Insert(new IntersectionSweepEvent(intersection.Value, false, false,
+                            segment, otherSegment));
+                    }
                 }
             }
             else if (ev.IsIntersection)
             {
-
+                // stop on first intersection
+                intersected = new Tuple<LineSegment, LineSegment>(ev.Segment, ev.OtherSegment);
+                events.Clear();
+                status.Clear();
             }
             else
             {
