@@ -11,7 +11,6 @@ namespace Util.Algorithms.LongTour
         where E : IntersectionSweepEvent, ISweepEvent<T>, IComparable<E>, IEquatable<E>
         where T : IComparable<T>, IEquatable<T>
     {
-
         public Tuple<LineSegment, LineSegment> intersected;
 
         public Tuple<LineSegment, LineSegment> FindIntersection(IEnumerable<LineSegment> segments)
@@ -100,6 +99,10 @@ namespace Util.Algorithms.LongTour
             else if (ev.IsEnd)
             {
                 ev = ev.OtherEvent;
+                if (ev.StatusItem == null)
+                {
+                    return;
+                }
 
                 IntersectionStatusItem prev, next;
                 bool prevFound = status.FindNextSmallest(ev.StatusItem, out prev);
