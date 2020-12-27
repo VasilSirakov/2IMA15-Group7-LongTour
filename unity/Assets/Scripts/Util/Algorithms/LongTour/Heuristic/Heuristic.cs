@@ -29,20 +29,19 @@ namespace Util.Algorithms.LongTour.Heuristic
             this.tourSegments.Clear();
 
             // TODO: Determine which vertex to start from.
-            bool tourExists = this.GetTourSegments(this.inputVertices[0], new Stack<Vertex>());
-            if (!tourExists)
-            {
-                throw new Exception("No valid tour found.");
-            }
+            this.ComputeValidTour(this.inputVertices[0], new Stack<Vertex>());
 
+            // List is populated by the ComputeValidTour function.
             return this.tourSegments;
         }
 
-        private bool GetTourSegments(Vertex current, Stack<Vertex> alreadyVisited)
+        private bool ComputeValidTour(Vertex current, Stack<Vertex> alreadyVisited)
         {
             // Exit condition. When we have 'n' vertices and 'n-1' edges we must exit with true, which means
-            // a tour has been found.
-            if (this.tourSegments.Count == this.inputVertices.Count - 1)
+            // a tour has been found. Or, when no input has been supplied, just return true. The segment list 
+            // will be empty.
+            if (this.inputVertices.Count == 0 ||
+                this.tourSegments.Count == this.inputVertices.Count - 1)
             {
                 return true;
             }
