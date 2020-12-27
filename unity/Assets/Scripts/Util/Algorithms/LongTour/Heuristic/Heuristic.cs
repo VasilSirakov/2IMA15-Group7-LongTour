@@ -22,7 +22,7 @@ namespace Util.Algorithms.LongTour.Heuristic
             this.tourSegments = new List<LineSegment>();
         }
 
-        public IEnumerable<LineSegment> GetResult()
+        public IEnumerable<LineSegment> GetResultingTour()
         {
             // In case this function is called more than once on the same instance of this class.
             this.tourSegments.Clear();
