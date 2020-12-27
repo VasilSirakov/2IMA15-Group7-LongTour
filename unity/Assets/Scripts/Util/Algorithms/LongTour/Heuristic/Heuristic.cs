@@ -52,11 +52,12 @@ namespace Util.Algorithms.LongTour.Heuristic
 
             foreach (var segment in potentialSegments)
             {
-                // Try to add the segment to the tourSegments list if it is a legal (does not intersect any of the
-                // already added segments).
-                bool added = this.TryAddSegmentToTour(segment);
-                if (added)
+                // Check if segment is legal (does not intersect any other segments so far, and does not overlap any
+                // of the other input vertices except its start and end point.
+                bool legal = this.IsSegmentLegal(segment);
+                if (legal)
                 {
+                    this.tourSegments.Add(segment);
                     // If you added an edge to the tour, e.g. {(1,1),(2,2)}, make vertex (2,2) your next starting point.
                     var nextVertex = new Vertex(segment.Point2);
                     bool validTourExists = this.GetTourSegments(nextVertex, alreadyVisited);
@@ -82,17 +83,6 @@ namespace Util.Algorithms.LongTour.Heuristic
                     // .OrderBy(to => Guid.NewGuid())
                     .Select(to => new LineSegment(from.Pos, to.Pos))
                     .ToList();
-        }
-
-        private bool TryAddSegmentToTour(LineSegment segmentToAdd)
-        {
-            if (this.IsSegmentLegal(segmentToAdd))
-            {
-                this.tourSegments.Add(segmentToAdd);
-                return true;
-            }
-
-            return false;
         }
 
         private bool IsSegmentLegal(LineSegment segmentToAdd)
