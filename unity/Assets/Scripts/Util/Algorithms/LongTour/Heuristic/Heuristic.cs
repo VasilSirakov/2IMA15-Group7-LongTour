@@ -49,14 +49,6 @@ namespace Util.Algorithms.LongTour.Heuristic
             // so far). Mark current vertex as visited.
             var potentialSegments = this.GetPotentialLineSegmentsForVertex(current, alreadyVisited);
             alreadyVisited.Push(current);
-            
-            // If there are no more segments to be added and the tour segments are not yet 'n-1', then report that
-            // a tour cannot be found for this subtree of the recursion. Also, remove current vertex from visited.
-            if (!potentialSegments.Any())
-            {
-                alreadyVisited.Pop();
-                return false;
-            }
 
             foreach (var segment in potentialSegments)
             {
