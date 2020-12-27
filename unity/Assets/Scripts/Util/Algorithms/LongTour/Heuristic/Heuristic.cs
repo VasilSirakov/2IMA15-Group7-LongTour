@@ -47,8 +47,8 @@ namespace Util.Algorithms.LongTour.Heuristic
 
             // Get all potential segments that can be added regardless of whether they are legal (intersect anything
             // so far). Mark current vertex as visited.
-            var potentialSegments = this.GetPotentialLineSegmentsForVertex(current, alreadyVisited);
             alreadyVisited.Push(current);
+            var potentialSegments = this.GetPotentialLineSegmentsForVertex(current, alreadyVisited);
 
             foreach (var segment in potentialSegments)
             {
@@ -76,7 +76,6 @@ namespace Util.Algorithms.LongTour.Heuristic
         {
             return this.inputVertices
                     .Except(alreadyVisited)
-                    .Where(to => !to.Equals(from))
                     // TODO: Check which 'order by' to use.
                     // .OrderBy(to => this.GetEuclidianDistance(from, to))
                     .OrderByDescending(to => this.GetEuclidianDistance(from, to))
