@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using Util.Geometry;
 using Util.Geometry.Graph;
+using Util.Math;
 
 namespace Util.Algorithms.LongTour.Heuristic
 {
@@ -27,6 +28,7 @@ namespace Util.Algorithms.LongTour.Heuristic
             // In case this function is called more than once on the same instance of this class.
             this.tourSegments.Clear();
 
+            // TODO: Determine which vertex to start from.
             bool tourExists = this.GetTourSegments(this.inputVertices[0], new Stack<Vertex>());
             if (!tourExists)
             {
@@ -77,10 +79,10 @@ namespace Util.Algorithms.LongTour.Heuristic
             return this.inputVertices
                     .Except(alreadyVisited)
                     // TODO: Check which 'order by' to use.
-                    // .OrderBy(to => this.GetEuclidianDistance(from, to))
-                    .OrderByDescending(to => this.GetEuclidianDistance(from, to))
-                    // .OrderBy(to => Guid.NewGuid())
                     .Select(to => new LineSegment(from.Pos, to.Pos))
+                    .OrderByDescending(segment => segment.Magnitude)
+                    // .OrderBy(segment => segment.Magnitude)
+                    // .OrderBy(to => Guid.NewGuid())
                     .ToList();
         }
 
@@ -90,9 +92,7 @@ namespace Util.Algorithms.LongTour.Heuristic
                 return false;
 
             if (this.OverlapsAnyVertex(segmentToAdd))
-            {
                 return false;
-            }
            
             return true;
         }
@@ -119,15 +119,6 @@ namespace Util.Algorithms.LongTour.Heuristic
                 segment => LineSegment.IntersectProper(segment, candidateSegment) == null
                     ? false
                     : true);
-        }
-
-        private float GetEuclidianDistance(Vertex v1, Vertex v2)
-        {
-            float x1 = v1.Pos.x;
-            float x2 = v2.Pos.x;
-            float y1 = v1.Pos.y;
-            float y2 = v2.Pos.y;
-            return (float)System.Math.Sqrt(System.Math.Pow(x1 - x2, 2) + System.Math.Pow(y1 - y2, 2));
         }
     }
 }
