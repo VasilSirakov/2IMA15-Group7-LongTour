@@ -61,7 +61,7 @@ namespace Util.Algorithms.LongTour.Heuristic
                     this.tourSegments.Add(segment);
                     // If you added an edge to the tour, e.g. {(1,1),(2,2)}, make vertex (2,2) your next starting point.
                     var nextVertex = new Vertex(segment.Point2);
-                    bool validTourExists = this.GetTourSegments(nextVertex, alreadyVisited);
+                    bool validTourExists = this.ComputeValidTour(nextVertex, alreadyVisited);
                     if (validTourExists)
                         return true;
                     else
