@@ -3,6 +3,7 @@
     using System;
     using UnityEngine;
     using UnityEngine.UI;
+    using General.Controller;
 
     /// <summary>
     /// Container for a button that allows the button to be toggled on/of.

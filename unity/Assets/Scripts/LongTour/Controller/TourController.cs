@@ -22,6 +22,8 @@
         private GameObject m_pointPrefab;
         [SerializeField]
         private ButtonContainer m_advanceButton;
+        [SerializeField]
+        private ButtonContainer m_resetButton;
 
         [SerializeField]
         private List<TourLevel> m_levels;
@@ -104,6 +106,8 @@
             //TODO implement solution 
             //m_solutionTour;
 
+            m_resetButton.Enable();
+
             //m_advanceButton.Disable();
         }
 
@@ -166,8 +170,7 @@
         ///<summary>
         ///Clears tour and relevant game objects
         /// </summary>
-
-        public void Clear()
+        private void Clear()
         {
             //TODO: clear tour solution
             //m_solutionTour = null;
@@ -180,6 +183,14 @@
                 // destory the objects
                 DestroyImmediate(obj);
             }
+        }
+
+        /// <summary>
+        /// Clears all edges to reset the level
+        /// </summary>
+        public void ClearEdges()
+        {
+            InitLevel();
         }
     }
 }
