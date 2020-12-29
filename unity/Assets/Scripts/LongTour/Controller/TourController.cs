@@ -167,7 +167,7 @@
         ///Clears tour and relevant game objects
         /// </summary>
 
-        private void Clear()
+        public void Clear()
         {
             //TODO: clear tour solution
             //m_solutionTour = null;
