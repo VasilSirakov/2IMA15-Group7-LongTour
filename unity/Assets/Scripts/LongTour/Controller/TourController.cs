@@ -8,14 +8,14 @@
     using General.Model;
     using General.Controller;
     using System.Linq;
+    using System;
+    using Util.Geometry.Graph;
     using Util.Geometry.Polygon;
     using Util.Algorithms.Polygon;
     using Util.Geometry;
 
     public class TourController : MonoBehaviour, IController
     {
-        public LineRenderer m_line;
-
         [SerializeField]
         private GameObject m_roadMeshPrefab;
         [SerializeField]
@@ -30,84 +30,59 @@
         [SerializeField]
         private string m_victoryScene;
 
-        internal TourPoint m_firstPoint;
-        internal TourPoint m_secondPoint;
-        internal bool m_locked;
+        //list of removable instantiated game objects
+        private List<GameObject> instantObjects = new List<GameObject>();
 
-        private List<TourPoint> m_points;
-        private HashSet<LineSegment> m_segments;
+        //Graph info
+        protected IGraph m_graph;
+        protected TourPoint[] m_tourPoints;
 
-        private List<GameObject> instantObjects;
-            
         protected int m_levelCounter = 0;    
 
         // Start is called before the first frame update
         void Start()
         {
-            //get unity objects
-            m_points = new List<TourPoint>();
-            m_segments = new HashSet<LineSegment>();
-            instantObjects = new List<GameObject>();
-
+            Clear();
             InitLevel();
 
             //Compute Tour
             //TODO computer tour
         }
 
-        // Update is called once per frame
-        void Update()
-        {
-            if (m_locked && !Input.GetMouseButton(0))
-            {
-                //create road
-                AddSegment(m_firstPoint, m_secondPoint);
-            }
-            else if (Input.GetMouseButton(0))
-            {
-                //update road endpoint
-                var pos = Camera.main.ScreenToWorldPoint(Input.mousePosition + 10 * Vector3.forward);
-                m_line.SetPosition(1, pos);
-            }
+        //Updates handled by SegmentMaker
 
-            //clear road creation variables
-            if ((m_locked && !Input.GetMouseButton(0)) || Input.GetMouseButtonUp(0))
-            {
-                m_locked = false;
-                m_firstPoint = null;
-                m_secondPoint = null;
-                m_line.enabled = false;
-            }
-        }
-
+        /// <summary>
+        /// Initialize the level
+        /// </summary>
         public void InitLevel()
         {
+            // clear old level
+            Clear();
+
+            // check if all levels are solved
             if (m_levelCounter >= m_levels.Count)
             {
                 SceneManager.LoadScene(m_victoryScene);
                 return;
             }
 
-            // clear old level
-            Clear();
-
             //initialize points
             foreach (var point in m_levels[m_levelCounter].Points)
             {
-                var obj = Instantiate(m_pointPrefab, point, Quaternion.identity) as GameObject;
+                var obj = Instantiate(m_pointPrefab, point, Quaternion.identity);
                 obj.transform.parent = this.transform;
                 instantObjects.Add(obj);
             }
 
             // make vertex list
-            m_points = FindObjectsOfType<TourPoint>().ToList();
+            m_tourPoints = FindObjectsOfType<TourPoint>();
 
-            // computer long tour
-            //TODO implement solution 
-            //m_solutionTour;
+            //init empty graph
+            m_graph = new AdjacencyListGraph(m_tourPoints.Select(go => go.Vertex));
 
-            m_resetButton.Enable();
+            var vertices = m_tourPoints.Select(go => new Vertex(go.Pos));
 
+            //TODO disable/enable based on solution quality
             //m_advanceButton.Disable();
         }
 
@@ -120,35 +95,54 @@
 
         public void AddSegment(TourPoint a_point1, TourPoint a_point2)
         {
-            var segment = new LineSegment(a_point1.Pos, a_point2.Pos);
+            //var segment = new LineSegment(a_point1.Pos, a_point2.Pos);
 
-            // dont add double segments (also checking the reverse)
-            if (m_segments.Contains(segment) || m_segments.Contains(new LineSegment(a_point2.Pos, a_point1.Pos)))
+            // Dont add edge to itself or double edges
+            if (a_point1 == a_point2 || m_graph.ContainsEdge(a_point1.Vertex, a_point2.Vertex))
             {
                 return;
             }
 
-            m_segments.Add(segment);
-
-            //instantiate new road mesh
+            //instantiate new road mesh object
             var roadmesh = Instantiate(m_roadMeshPrefab, Vector3.forward, Quaternion.identity) as GameObject;
             roadmesh.transform.parent = this.transform;
+            
+            //remember segment for destoryal later
             instantObjects.Add(roadmesh);
-
-            roadmesh.GetComponent<TourSegment>().Segment = segment;
-
+            
+            //create road mesh
             var roadmeshScript = roadmesh.GetComponent<ReshapingMesh>();
             roadmeshScript.CreateNewMesh(a_point1.transform.position, a_point2.transform.position);
 
+            //create road edge
+            var edge = m_graph.AddEdge(a_point1.Vertex, a_point2.Vertex);
+
+            //error check
+            if (edge == null)
+            {
+                throw new InvalidOperationException("Edge could not be added to graph");
+            }
+
+            //link edge to segment
+            roadmesh.GetComponent<TourSegment>().Edge = edge;
+
+            //check the solution
             CheckSolution();
         }
 
+        /// <summary>
+        /// Removes a segment from the graph
+        /// </summary>
+        /// <param name="a_segment"></param>
         public void RemoveSegment(TourSegment a_segment)
         {
-            m_segments.Remove(a_segment.Segment);
+            m_graph.RemoveEdge(a_segment.Edge);
             CheckSolution();
         }
 
+        /// <summary>
+        /// Checks whether there is a solution of sufficient quality present
+        /// </summary>
         public void CheckSolution()
         {
             if (CheckTour())
@@ -172,17 +166,17 @@
         /// </summary>
         private void Clear()
         {
-            //TODO: clear tour solution
-            //m_solutionTour = null;
-            m_points.Clear();
-            m_segments.Clear();
+            //clear the graph if it exists
+            if (m_graph != null) m_graph.Clear();
 
-            //destroy game objects created in level
+            //Destroy the objects related to the graph
             foreach (var obj in instantObjects)
             {
                 // destory the objects
                 DestroyImmediate(obj);
             }
+            instantObjects.Clear();
+            m_tourPoints = null;
         }
 
         /// <summary>
