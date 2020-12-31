@@ -145,7 +145,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 28df007f35be96e4aa63cc26c280dc10, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_line: {fileID: 826534950278811018}
   m_roadMeshPrefab: {fileID: 4893322794614436188, guid: 3e1f8c1ef61efe64ba1270017bdca4a3,
     type: 3}
   m_pointPrefab: {fileID: 2294916941558829680, guid: d7a6d2174ae363649a9526f720b9a9ce,
@@ -159,30 +158,6 @@ MonoBehaviour:
   - {fileID: -8166842018247882458, guid: fb5f04e6fc67b664194eb01b0295cf31, type: 3}
   - {fileID: 11400000, guid: 947db5f7e8ca2e74688d050429e1813e, type: 2}
   m_victoryScene: tourVictory
---- !u!114 &291285744
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 291285741}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2e8e58b5c3cc0344cadbfe3cf33f8031, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &291285745
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 291285741}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2e8e58b5c3cc0344cadbfe3cf33f8031, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &318220171
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -954,9 +929,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e8e58b5c3cc0344cadbfe3cf33f8031, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!120 &826534950278811018 stripped
-LineRenderer:
-  m_CorrespondingSourceObject: {fileID: 826534948572647600, guid: 15b8c7f4bdd24c446970bb1c8341ef37,
-    type: 3}
-  m_PrefabInstance: {fileID: 826534950278811014}
-  m_PrefabAsset: {fileID: 0}

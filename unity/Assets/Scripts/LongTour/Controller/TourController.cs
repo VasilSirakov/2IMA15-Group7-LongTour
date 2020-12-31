@@ -78,6 +78,10 @@
             m_tourPoints = FindObjectsOfType<TourPoint>();
 
             //init empty graph
+            if (m_graph != null)
+            {
+                m_graph.Clear();
+            }
             m_graph = new AdjacencyListGraph(m_tourPoints.Select(go => go.Vertex));
 
             var vertices = m_tourPoints.Select(go => new Vertex(go.Pos));
@@ -90,13 +94,12 @@
         {
             // increase level index
             m_levelCounter++;
+            Clear();
             InitLevel();
         }
 
         public void AddSegment(TourPoint a_point1, TourPoint a_point2)
         {
-            //var segment = new LineSegment(a_point1.Pos, a_point2.Pos);
-
             // Dont add edge to itself or double edges
             if (a_point1 == a_point2 || m_graph.ContainsEdge(a_point1.Vertex, a_point2.Vertex))
             {
@@ -184,6 +187,7 @@
         /// </summary>
         public void ClearEdges()
         {
+            Clear();
             InitLevel();
         }
     }
