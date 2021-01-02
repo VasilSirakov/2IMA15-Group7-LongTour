@@ -86,8 +86,7 @@
 
             var vertices = m_tourPoints.Select(go => new Vertex(go.Pos));
 
-            //TODO disable/enable based on solution quality
-            //m_advanceButton.Disable();
+            CheckSolution();
         }
 
         public void AdvanceLevel()
@@ -160,7 +159,37 @@
 
         private bool CheckTour()
         {
-            //TODO: check tour against some rules / heuristic algo
+            // Check if the number of input edges is correct.
+            if (this.m_graph.EdgeCount != this.m_levels[m_levelCounter].Points.Count - 1)
+            {
+                return false;
+            }
+
+            // Check if the degree of a vertex is either 1 or 2. 1 is when the vertex is the start point
+            // or end point of the tour. 2 is for all other vertices.
+            var vertices = this.m_levels[m_levelCounter].Points
+                .Select(x => new Vertex(x));
+            foreach (var vertex in vertices)
+            {
+                int degreeOfVertex = 
+                    this.m_graph.Edges.Count(e => e.Start.Equals(vertex)) +
+                    this.m_graph.Edges.Count(e => e.End.Equals(vertex));
+
+                if (degreeOfVertex == 0 || degreeOfVertex > 2)
+                {
+                    return false;
+                }
+            }
+
+            // Compare length of user tour to heuristic tour. If shorter, tour is invalid.
+            // TODO: Integrate heuristic algorithm output. 
+            float tourWeight = this.m_graph.Edges.Sum(e => e.Length);
+            if (tourWeight < -1)
+            {
+                return false;
+            }
+
+            // All other checks have been passed. Tour is valid.
             return true;
         }
 
