@@ -1,47 +1,49 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-public class TourPoint : MonoBehaviour
+﻿namespace LongTour
 {
-    public Vector2 Pos { get; private set; }
-    private TourController m_controller;
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+    using UnityEngine;
+    using Util.Geometry.Graph;
 
-    void Awake()
+    public class TourPoint : MonoBehaviour
     {
-        Pos = new Vector2(transform.position.x, transform.position.y);
-        m_controller = FindObjectOfType<TourController>();
-    }
+        public Vector2 Pos { get; private set; }
+        public Vertex Vertex { get; private set; }
 
-    void OnMouseDown()
-    {
-        m_controller.m_line.enabled = true;
-        m_controller.m_firstPoint = this;
-        m_controller.m_line.SetPosition(0, Pos);
-    }
+        private SegmentMaker m_segmentMaker;
 
-    void OnMouseEnter()
-    {
-        if (m_controller.m_firstPoint == null)
+        //Use this for initialization
+        void Awake()
         {
-            return;
-        }
-        m_controller.m_locked = true;
-        m_controller.m_secondPoint = this;
-        m_controller.m_line.SetPosition(1, Pos);
-    }
+            //create vertex at point position
+            Vertex = new Vertex(transform.position);
 
-    void OnMouseExit()
-    {
-        if (this != m_controller.m_secondPoint)
+            // find segmentmaker class to have user interaction
+            m_segmentMaker = FindObjectOfType<SegmentMaker>();
+            if (m_segmentMaker == null)
+            {
+                throw new InvalidProgramException("Road builder cannot be found");
+            }
+
+            Pos = new Vector2(transform.position.x, transform.position.y);
+            
+        }
+
+        void OnMouseDown()
         {
-            return;
+            m_segmentMaker.MouseDown(this);
         }
-        
-        m_controller.m_locked = false;
-        m_controller.m_secondPoint = null;
-        var pos = Camera.main.ScreenToWorldPoint(Input.mousePosition + 10 * Vector3.forward);
-        m_controller.m_line.SetPosition(1, pos);
-     }
 
+        void OnMouseEnter()
+        {
+            m_segmentMaker.MouseEnter(this);
+        }
+
+        void OnMouseExit()
+        {
+            m_segmentMaker.MouseExit(this);
+        }
+
+    }
 }
