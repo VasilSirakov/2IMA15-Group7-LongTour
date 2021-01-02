@@ -24,6 +24,8 @@
         private ButtonContainer m_advanceButton;
         [SerializeField]
         private ButtonContainer m_resetButton;
+        [SerializeField]
+        private ButtonContainer m_backButton;
 
         [SerializeField]
         private List<TourLevel> m_levels;
