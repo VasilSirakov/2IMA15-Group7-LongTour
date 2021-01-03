@@ -9,7 +9,7 @@ using Util.Math;
 
 namespace Util.Algorithms.LongTour.Heuristic
 {
-    public class HeuristicAlgorithm
+    public class Heuristic
     {
         private readonly List<Vertex> inputVertices;
         // TODO: Not a fan of field mutation in a method such as GetTourLineSegments.
@@ -17,13 +17,13 @@ namespace Util.Algorithms.LongTour.Heuristic
         // to return a list of line segments instead of a boolean.
         private readonly List<LineSegment> tourSegments;
 
-        public HeuristicAlgorithm(List<Vertex> vertices)
+        public Heuristic(IEnumerable<Vertex> vertices)
         {
             this.inputVertices = vertices.OrderBy(x => x.Pos.x).ToList();
             this.tourSegments = new List<LineSegment>();
         }
 
-        public IEnumerable<LineSegment> GetResultingTour()
+        public List<LineSegment> GetResultingTour()
         {
             // In case this function is called more than once on the same instance of this class.
             this.tourSegments.Clear();

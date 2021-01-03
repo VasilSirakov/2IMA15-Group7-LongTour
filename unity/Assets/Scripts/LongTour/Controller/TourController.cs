@@ -13,6 +13,7 @@
     using Util.Geometry.Polygon;
     using Util.Algorithms.Polygon;
     using Util.Geometry;
+    using Util.Algorithms.LongTour.Heuristic;
 
     public class TourController : MonoBehaviour, IController
     {
@@ -34,6 +35,10 @@
 
         //list of removable instantiated game objects
         private List<GameObject> instantObjects = new List<GameObject>();
+
+        private Heuristic m_heuristic;
+        private List<LineSegment> heuristicTour;
+        private float heuristicTourLength;
 
         //Graph info
         protected IGraph m_graph;
@@ -87,6 +92,10 @@
             m_graph = new AdjacencyListGraph(m_tourPoints.Select(go => go.Vertex));
 
             var vertices = m_tourPoints.Select(go => new Vertex(go.Pos));
+
+            m_heuristic = new Heuristic(vertices);
+            heuristicTour = m_heuristic.GetResultingTour();
+            heuristicTourLength = heuristicTour.Sum(x => x.Magnitude);
 
             CheckSolution();
         }
@@ -186,7 +195,7 @@
             // Compare length of user tour to heuristic tour. If shorter, tour is invalid.
             // TODO: Integrate heuristic algorithm output. 
             float tourWeight = this.m_graph.Edges.Sum(e => e.Length);
-            if (tourWeight < -1)
+            if (tourWeight < heuristicTourLength)
             {
                 return false;
             }
