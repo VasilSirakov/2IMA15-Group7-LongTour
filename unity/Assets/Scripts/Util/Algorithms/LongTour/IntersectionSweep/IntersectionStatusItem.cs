@@ -1,7 +1,7 @@
 ﻿using System;
 using Util.Math;
 
-namespace Assets.Scripts.Util.Algorithms.LongTour
+namespace Util.Algorithms.LongTour
 {
     public class IntersectionStatusItem : IComparable<IntersectionStatusItem>, IEquatable<IntersectionStatusItem>
     {

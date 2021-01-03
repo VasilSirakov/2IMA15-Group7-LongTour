@@ -1,10 +1,9 @@
 ﻿using System;
 using UnityEngine;
-using Util.Algorithms;
 using Util.Geometry;
 using Util.Math;
 
-namespace Assets.Scripts.Util.Algorithms.LongTour
+namespace Util.Algorithms.LongTour
 {
     public class IntersectionSweepEvent : ISweepEvent<IntersectionStatusItem>, IComparable<IntersectionSweepEvent>, IEquatable<IntersectionSweepEvent>
     {

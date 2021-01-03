@@ -1,4 +1,4 @@
-﻿namespace LongTour
+namespace LongTour
 {
     using System.Collections;
     using System.Collections.Generic;
@@ -13,6 +13,7 @@
     using Util.Geometry.Polygon;
     using Util.Algorithms.Polygon;
     using Util.Geometry;
+    using Util.Algorithms.LongTour;
 
     public class TourController : MonoBehaviour, IController
     {
@@ -35,6 +36,8 @@
         //list of removable instantiated game objects
         private List<GameObject> instantObjects = new List<GameObject>();
 
+        private IntersectionSweepLine<IntersectionSweepEvent, IntersectionStatusItem> m_sweepline;
+  
         //Graph info
         protected IGraph m_graph;
         protected TourPoint[] m_tourPoints;
@@ -67,6 +70,8 @@
                 SceneManager.LoadScene(m_victoryScene);
                 return;
             }
+
+            m_sweepline = new IntersectionSweepLine<IntersectionSweepEvent, IntersectionStatusItem>();
 
             //initialize points
             foreach (var point in m_levels[m_levelCounter].Points)
@@ -161,6 +166,18 @@
 
         private bool CheckTour()
         {
+            // Perform plane sweep to find first interesection
+            // Perform before other checks to show intersection as it happens
+            List<Edge> intersected = m_sweepline.FindIntersection(m_graph.Edges);
+            if (intersected != null)
+            {
+                foreach (Edge e in intersected)
+                {
+                    // TODO: Colour edge in graph
+                } 
+                return false;
+            }
+
             // Check if the number of input edges is correct.
             if (this.m_graph.EdgeCount != this.m_levels[m_levelCounter].Points.Count - 1)
             {

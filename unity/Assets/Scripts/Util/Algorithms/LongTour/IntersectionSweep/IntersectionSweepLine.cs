@@ -1,9 +1,9 @@
 ﻿using Util.DataStructures.BST;
 using System;
 using System.Collections.Generic;
-using Assets.Scripts.Util.Algorithms.LongTour;
 using Util.Geometry;
 using UnityEngine;
+using Util.Geometry.Graph;
 
 namespace Util.Algorithms.LongTour
 {
@@ -11,12 +11,23 @@ namespace Util.Algorithms.LongTour
         where E : IntersectionSweepEvent, ISweepEvent<T>, IComparable<E>, IEquatable<E>
         where T : IComparable<T>, IEquatable<T>
     {
-        public Tuple<LineSegment, LineSegment> intersected;
+        public List<Edge> intersected;
 
-        public Tuple<LineSegment, LineSegment> FindIntersection(IEnumerable<LineSegment> segments)
+        public List<LineSegment> CreateSegments(IEnumerable<Edge> edges)
+        {
+            var segments = new List<LineSegment>();
+            foreach (Edge e in edges)
+            {
+                segments.Add(new LineSegment(e.Start.Pos, e.End.Pos));
+            }
+            return segments;
+        }
+
+        public List<Edge> FindIntersection(IEnumerable<Edge> edges)
         {
             intersected = null;
             var sweepLine = new SweepLine<IntersectionSweepEvent, IntersectionStatusItem>();
+            List<LineSegment> segments = CreateSegments(edges);
             IEnumerable<E> events = CreateEvents(segments) as IEnumerable<E>;
             sweepLine.InitializeEvents(events);
             sweepLine.VerticalSweep(HandleEvent);
@@ -125,7 +136,11 @@ namespace Util.Algorithms.LongTour
             else if (ev.IsIntersection)
             {
                 // stop on first intersection
-                intersected = new Tuple<LineSegment, LineSegment>(ev.Segment, ev.OtherSegment);
+                intersected = new List<Edge>
+                {
+                    new Edge(new Vertex(ev.Segment.Point1), new Vertex(ev.Segment.Point2)),
+                    new Edge(new Vertex(ev.OtherSegment.Point1), new Vertex(ev.OtherSegment.Point2))
+                };
                 events.Clear();
                 status.Clear();
             }
