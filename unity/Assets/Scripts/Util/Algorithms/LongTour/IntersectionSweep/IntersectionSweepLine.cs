@@ -1,4 +1,4 @@
-﻿using Util.DataStructures.BST;
+using Util.DataStructures.BST;
 using System;
 using System.Collections.Generic;
 using Util.Geometry;

@@ -118,7 +118,7 @@ namespace LongTour
             //instantiate new road mesh object
             var roadmesh = Instantiate(m_roadMeshPrefab, Vector3.forward, Quaternion.identity) as GameObject;
             roadmesh.transform.parent = this.transform;
-            roadmesh.name = $"mesh({a_point1.Pos}, {a_point2.Pos})";
+            roadmesh.name = $"mesh({a_point1.Vertex}, {a_point2.Vertex})";
             
             //remember segment for destoryal later
             instantObjects.Add(roadmesh);
@@ -185,8 +185,8 @@ namespace LongTour
                 foreach (Edge e in intersected)
                 {
                     var roadmesh = instantObjects
-                        .Find(x => x != null && (x.name == $"mesh({e.Start.Pos}, {e.End.Pos})"
-                                                || x.name == $"mesh({e.End.Pos}, {e.Start.Pos})"));
+                        .Find(x => x != null && (x.name == $"mesh({e.Start}, {e.End})"
+                                                || x.name == $"mesh({e.End}, {e.Start})"));
                     if (roadmesh != null)
                     {
                         var renderer = roadmesh.GetComponent<MeshRenderer>();

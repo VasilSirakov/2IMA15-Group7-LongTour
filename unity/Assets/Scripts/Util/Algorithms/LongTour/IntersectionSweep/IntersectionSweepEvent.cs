@@ -83,6 +83,10 @@ namespace Util.Algorithms.LongTour
             {
                 return IsStart ? 1 : -1;
             }
+            if (Segment != other.Segment)
+            {
+                return Below(other.OtherEvent.Point) ? -1 : 1;
+            }
             return 0;
         }
 
