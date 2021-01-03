@@ -190,7 +190,6 @@
             }
 
             // Compare length of user tour to heuristic tour. If shorter, tour is invalid.
-            // TODO: Integrate heuristic algorithm output. 
             float tourWeight = this.m_graph.Edges.Sum(e => e.Length);
             if (tourWeight < heuristicTourLength)
             {
