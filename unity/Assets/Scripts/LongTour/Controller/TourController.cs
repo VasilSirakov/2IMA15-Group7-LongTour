@@ -17,8 +17,8 @@ namespace LongTour
 
     public class TourController : MonoBehaviour, IController
     {
-        public Material roadMaterial;
-        public Material intersectedMaterial;
+        public Material m_roadMaterial;
+        public Material m_intersectedMaterial;
 
         [SerializeField]
         private GameObject m_roadMeshPrefab;
@@ -174,7 +174,7 @@ namespace LongTour
             foreach (GameObject mesh in instantObjects.Where(x => x != null && x.name.Contains("mesh")))
             {
                 var renderer = mesh.GetComponent<MeshRenderer>();
-                renderer.material = roadMaterial;
+                renderer.material = m_roadMaterial;
             }
             // Perform plane sweep to find first interesection
             // Perform before other checks to show intersection as it happens
@@ -190,7 +190,7 @@ namespace LongTour
                     if (roadmesh != null)
                     {
                         var renderer = roadmesh.GetComponent<MeshRenderer>();
-                        renderer.material = intersectedMaterial;
+                        renderer.material = m_intersectedMaterial;
                     }
                 } 
                 return false;
