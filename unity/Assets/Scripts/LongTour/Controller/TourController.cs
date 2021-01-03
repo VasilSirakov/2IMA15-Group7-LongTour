@@ -51,9 +51,6 @@
         {
             Clear();
             InitLevel();
-
-            //Compute Tour
-            //TODO computer tour
         }
 
         //Updates handled by SegmentMaker
