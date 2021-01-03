@@ -17,6 +17,9 @@ namespace LongTour
 
     public class TourController : MonoBehaviour, IController
     {
+        public Material roadMaterial;
+        public Material intersectedMaterial;
+
         [SerializeField]
         private GameObject m_roadMeshPrefab;
         [SerializeField]
@@ -115,6 +118,7 @@ namespace LongTour
             //instantiate new road mesh object
             var roadmesh = Instantiate(m_roadMeshPrefab, Vector3.forward, Quaternion.identity) as GameObject;
             roadmesh.transform.parent = this.transform;
+            roadmesh.name = $"mesh({a_point1.Pos}, {a_point2.Pos})";
             
             //remember segment for destoryal later
             instantObjects.Add(roadmesh);
@@ -166,14 +170,28 @@ namespace LongTour
 
         private bool CheckTour()
         {
+            // Reset mesh colours to original (in case intersection has been removed)
+            foreach (GameObject mesh in instantObjects.Where(x => x != null && x.name.Contains("mesh")))
+            {
+                var renderer = mesh.GetComponent<MeshRenderer>();
+                renderer.material = roadMaterial;
+            }
             // Perform plane sweep to find first interesection
             // Perform before other checks to show intersection as it happens
             List<Edge> intersected = m_sweepline.FindIntersection(m_graph.Edges);
             if (intersected != null)
             {
+                // Find existing roadmesh for intersected edges and change material
                 foreach (Edge e in intersected)
                 {
-                    // TODO: Colour edge in graph
+                    var roadmesh = instantObjects
+                        .Find(x => x != null && (x.name == $"mesh({e.Start.Pos}, {e.End.Pos})"
+                                                || x.name == $"mesh({e.End.Pos}, {e.Start.Pos})"));
+                    if (roadmesh != null)
+                    {
+                        var renderer = roadmesh.GetComponent<MeshRenderer>();
+                        renderer.material = intersectedMaterial;
+                    }
                 } 
                 return false;
             }
