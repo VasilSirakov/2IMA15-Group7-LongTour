@@ -29,6 +29,8 @@
         [SerializeField]
         private ButtonContainer m_backButton;
         [SerializeField]
+        private ButtonContainer m_giveUpButton;
+        [SerializeField]
         private Text m_scoreText;
 
         [SerializeField]
@@ -163,6 +165,7 @@
         {
             m_graph.RemoveEdge(a_segment.Edge);
             CheckSolution();
+            UpdateTextField();
         }
 
         /// <summary>
@@ -173,9 +176,11 @@
             if (CheckTour())
             {
                 m_advanceButton.Enable();
+                m_giveUpButton.Disable();
             }
             else
             {
+                m_giveUpButton.Enable();
                 m_advanceButton.Disable();
             }
         }
@@ -241,6 +246,52 @@
         {
             Clear();
             InitLevel();
+        }
+
+        public void GiveUp()
+        {
+            Clear();
+            InitLevel();
+            foreach (var lineSegment in heuristicTour)
+            {
+                Vertex endpoint1 = new Vertex(lineSegment.Point1);
+                Vertex endpoint2 = new Vertex(lineSegment.Point2);
+
+                Vector2 pos1 = endpoint1.Pos;
+                Vector2 pos2 = endpoint2.Pos;
+
+                // Dont add edge to itself or double edges
+                if (endpoint1 == endpoint2 || m_graph.ContainsEdge(endpoint1, endpoint2))
+                {
+                    return;
+                }
+
+                //instantiate new road mesh object
+                var roadmesh = Instantiate(m_roadMeshPrefab, Vector3.forward, Quaternion.identity) as GameObject;
+                roadmesh.transform.parent = this.transform;
+
+                //remember segment for destoryal later
+                instantObjects.Add(roadmesh);
+
+                //create road mesh
+                var roadmeshScript = roadmesh.GetComponent<ReshapingMesh>();
+                roadmeshScript.CreateNewMesh(pos1, pos2);
+
+                //create road edge
+                var edge = m_graph.AddEdge(endpoint1, endpoint2);
+
+                //error check
+                if (edge == null)
+                {
+                    throw new InvalidOperationException("Edge could not be added to graph");
+                }
+
+                //link edge to segment
+                roadmesh.GetComponent<TourSegment>().Edge = edge;
+            }
+            //check the solution
+            CheckSolution();
+            UpdateTextField();
         }
     }
 }
