@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using UnityEngine;
     using UnityEngine.SceneManagement;
+    using UnityEngine.UI;
     using General.Menu;
     using General.Model;
     using General.Controller;
@@ -27,11 +28,14 @@
         private ButtonContainer m_resetButton;
         [SerializeField]
         private ButtonContainer m_backButton;
+        [SerializeField]
+        private Text m_scoreText;
 
         [SerializeField]
         private List<TourLevel> m_levels;
         [SerializeField]
         private string m_victoryScene;
+
 
         //list of removable instantiated game objects
         private List<GameObject> instantObjects = new List<GameObject>();
@@ -49,7 +53,6 @@
         // Start is called before the first frame update
         void Start()
         {
-            Clear();
             InitLevel();
         }
 
@@ -60,9 +63,6 @@
         /// </summary>
         public void InitLevel()
         {
-            // clear old level
-            Clear();
-
             // check if all levels are solved
             if (m_levelCounter >= m_levels.Count)
             {
@@ -95,6 +95,20 @@
             heuristicTourLength = heuristicTour.Sum(x => x.Magnitude);
 
             CheckSolution();
+            UpdateTextField();
+        }
+
+        /// <summary>
+        /// Updates the text of the textfield
+        /// </summary>
+        private void UpdateTextField()
+        {
+            string text;
+            float tourWeight = this.m_graph.Edges.Sum(e => e.Length);
+
+            text = "Your current tour has length: " + tourWeight.ToString("0.##");
+            text += "\nThe heuristic length to beat: " + heuristicTourLength.ToString("0.##");
+            m_scoreText.text = text;
         }
 
         public void AdvanceLevel()
@@ -138,6 +152,7 @@
 
             //check the solution
             CheckSolution();
+            UpdateTextField();
         }
 
         /// <summary>
@@ -189,7 +204,7 @@
                 }
             }
 
-            // Compare length of user tour to heuristic tour. If shorter, tour is invalid.
+            // Compare length of user tour to heuristic tour. If shorter, the tour is not good enough.
             float tourWeight = this.m_graph.Edges.Sum(e => e.Length);
             if (tourWeight < heuristicTourLength)
             {
@@ -216,6 +231,7 @@
             }
             instantObjects.Clear();
             m_tourPoints = null;
+            m_scoreText.text = "";
         }
 
         /// <summary>
