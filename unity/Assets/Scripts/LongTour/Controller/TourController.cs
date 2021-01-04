@@ -4,6 +4,7 @@ namespace LongTour
     using System.Collections.Generic;
     using UnityEngine;
     using UnityEngine.SceneManagement;
+    using UnityEngine.UI;
     using General.Menu;
     using General.Model;
     using General.Controller;
@@ -13,6 +14,7 @@ namespace LongTour
     using Util.Geometry.Polygon;
     using Util.Algorithms.Polygon;
     using Util.Geometry;
+    using Util.Algorithms.LongTour.Heuristic;
     using Util.Algorithms.LongTour;
 
     public class TourController : MonoBehaviour, IController
@@ -30,14 +32,23 @@ namespace LongTour
         private ButtonContainer m_resetButton;
         [SerializeField]
         private ButtonContainer m_backButton;
+        [SerializeField]
+        private ButtonContainer m_giveUpButton;
+        [SerializeField]
+        private Text m_scoreText;
 
         [SerializeField]
         private List<TourLevel> m_levels;
         [SerializeField]
         private string m_victoryScene;
 
+
         //list of removable instantiated game objects
         private List<GameObject> instantObjects = new List<GameObject>();
+
+        private Heuristic m_heuristic;
+        private List<LineSegment> heuristicTour;
+        private float heuristicTourLength;
 
         private IntersectionSweepLine<IntersectionSweepEvent, IntersectionStatusItem> m_sweepline;
   
@@ -50,11 +61,7 @@ namespace LongTour
         // Start is called before the first frame update
         void Start()
         {
-            Clear();
             InitLevel();
-
-            //Compute Tour
-            //TODO computer tour
         }
 
         //Updates handled by SegmentMaker
@@ -64,9 +71,6 @@ namespace LongTour
         /// </summary>
         public void InitLevel()
         {
-            // clear old level
-            Clear();
-
             // check if all levels are solved
             if (m_levelCounter >= m_levels.Count)
             {
@@ -96,7 +100,25 @@ namespace LongTour
 
             var vertices = m_tourPoints.Select(go => new Vertex(go.Pos));
 
+            m_heuristic = new Heuristic(vertices);
+            heuristicTour = m_heuristic.GetResultingTour();
+            heuristicTourLength = heuristicTour.Sum(x => x.Magnitude);
+
             CheckSolution();
+            UpdateTextField();
+        }
+
+        /// <summary>
+        /// Updates the text of the textfield
+        /// </summary>
+        private void UpdateTextField()
+        {
+            string text;
+            float tourWeight = this.m_graph.Edges.Sum(e => e.Length);
+
+            text = "Your current tour has length: " + tourWeight.ToString("0.##");
+            text += "\nThe heuristic length to beat: " + heuristicTourLength.ToString("0.##");
+            m_scoreText.text = text;
         }
 
         public void AdvanceLevel()
@@ -141,6 +163,7 @@ namespace LongTour
 
             //check the solution
             CheckSolution();
+            UpdateTextField();
         }
 
         /// <summary>
@@ -151,6 +174,7 @@ namespace LongTour
         {
             m_graph.RemoveEdge(a_segment.Edge);
             CheckSolution();
+            UpdateTextField();
         }
 
         /// <summary>
@@ -161,13 +185,19 @@ namespace LongTour
             if (CheckTour())
             {
                 m_advanceButton.Enable();
+                m_giveUpButton.Disable();
             }
             else
             {
+                m_giveUpButton.Enable();
                 m_advanceButton.Disable();
             }
         }
 
+        /// <summary>
+        /// Checks whether the tour is valid and long enough
+        /// </summary>
+        /// <returns>true if tour is valid and long enough</returns>
         private bool CheckTour()
         {
             // Reset mesh colours to original (in case intersection has been removed)
@@ -218,10 +248,9 @@ namespace LongTour
                 }
             }
 
-            // Compare length of user tour to heuristic tour. If shorter, tour is invalid.
-            // TODO: Integrate heuristic algorithm output. 
+            // Compare length of user tour to heuristic tour. If shorter, the tour is not good enough.
             float tourWeight = this.m_graph.Edges.Sum(e => e.Length);
-            if (tourWeight < -1)
+            if (tourWeight < heuristicTourLength)
             {
                 return false;
             }
@@ -246,6 +275,7 @@ namespace LongTour
             }
             instantObjects.Clear();
             m_tourPoints = null;
+            m_scoreText.text = "";
         }
 
         /// <summary>
@@ -255,6 +285,55 @@ namespace LongTour
         {
             Clear();
             InitLevel();
+        }
+
+        /// <summary>
+        /// Gives the heuristic solution to the problem if the player gives up
+        /// </summary>
+        public void GiveUp()
+        {
+            Clear();
+            InitLevel();
+            foreach (var lineSegment in heuristicTour)
+            {
+                Vertex endpoint1 = new Vertex(lineSegment.Point1);
+                Vertex endpoint2 = new Vertex(lineSegment.Point2);
+
+                Vector2 pos1 = endpoint1.Pos;
+                Vector2 pos2 = endpoint2.Pos;
+
+                // Dont add edge to itself or double edges
+                if (endpoint1 == endpoint2 || m_graph.ContainsEdge(endpoint1, endpoint2))
+                {
+                    return;
+                }
+
+                //instantiate new road mesh object
+                var roadmesh = Instantiate(m_roadMeshPrefab, Vector3.forward, Quaternion.identity) as GameObject;
+                roadmesh.transform.parent = this.transform;
+
+                //remember segment for destoryal later
+                instantObjects.Add(roadmesh);
+
+                //create road mesh
+                var roadmeshScript = roadmesh.GetComponent<ReshapingMesh>();
+                roadmeshScript.CreateNewMesh(pos1, pos2);
+
+                //create road edge
+                var edge = m_graph.AddEdge(endpoint1, endpoint2);
+
+                //error check
+                if (edge == null)
+                {
+                    throw new InvalidOperationException("Edge could not be added to graph");
+                }
+
+                //link edge to segment
+                roadmesh.GetComponent<TourSegment>().Edge = edge;
+            }
+            //check the solution
+            CheckSolution();
+            UpdateTextField();
         }
     }
 }
