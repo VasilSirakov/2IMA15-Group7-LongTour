@@ -23,8 +23,8 @@
         {
             m_edge = GetComponent<LineRenderer>();
             m_edge.material = m_roadMaterial;
-            m_edge.startWidth = 0.3f;
-            m_edge.endWidth = 0.3f;
+            m_edge.startWidth = 0.25f;
+            m_edge.endWidth = 0.25f;
             m_tourController = FindObjectOfType<TourController>();
         }
 
