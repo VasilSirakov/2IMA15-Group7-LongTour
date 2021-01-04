@@ -145,6 +145,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 28df007f35be96e4aa63cc26c280dc10, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_roadMaterial: {fileID: 2100000, guid: 611eaec2adf16564eba474be5cb51313, type: 2}
+  m_intersectedMaterial: {fileID: 2100000, guid: 33e9fe11381b58a4a9c4c7ed2014fe65,
+    type: 2}
   m_roadMeshPrefab: {fileID: 4893322794614436188, guid: 3e1f8c1ef61efe64ba1270017bdca4a3,
     type: 3}
   m_pointPrefab: {fileID: 2294916941558829680, guid: d7a6d2174ae363649a9526f720b9a9ce,
@@ -989,3 +992,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e8e58b5c3cc0344cadbfe3cf33f8031, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_roadMaterial: {fileID: 2100000, guid: 28c18abf98e065a4fac4f19b1becc20d, type: 2}
