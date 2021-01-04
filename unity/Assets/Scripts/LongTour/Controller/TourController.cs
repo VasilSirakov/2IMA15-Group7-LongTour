@@ -1,4 +1,4 @@
-﻿namespace LongTour
+namespace LongTour
 {
     using System.Collections;
     using System.Collections.Generic;
@@ -15,9 +15,13 @@
     using Util.Algorithms.Polygon;
     using Util.Geometry;
     using Util.Algorithms.LongTour.Heuristic;
+    using Util.Algorithms.LongTour;
 
     public class TourController : MonoBehaviour, IController
     {
+        public Material m_roadMaterial;
+        public Material m_intersectedMaterial;
+
         [SerializeField]
         private GameObject m_roadMeshPrefab;
         [SerializeField]
@@ -46,6 +50,8 @@
         private List<LineSegment> heuristicTour;
         private float heuristicTourLength;
 
+        private IntersectionSweepLine<IntersectionSweepEvent, IntersectionStatusItem> m_sweepline;
+  
         //Graph info
         protected IGraph m_graph;
         protected TourPoint[] m_tourPoints;
@@ -71,6 +77,8 @@
                 SceneManager.LoadScene(m_victoryScene);
                 return;
             }
+
+            m_sweepline = new IntersectionSweepLine<IntersectionSweepEvent, IntersectionStatusItem>();
 
             //initialize points
             foreach (var point in m_levels[m_levelCounter].Points)
@@ -132,6 +140,7 @@
             //instantiate new road mesh object
             var roadmesh = Instantiate(m_roadMeshPrefab, Vector3.forward, Quaternion.identity) as GameObject;
             roadmesh.transform.parent = this.transform;
+            roadmesh.name = $"mesh({a_point1.Vertex}, {a_point2.Vertex})";
             
             //remember segment for destoryal later
             instantObjects.Add(roadmesh);
@@ -191,6 +200,32 @@
         /// <returns>true if tour is valid and long enough</returns>
         private bool CheckTour()
         {
+            // Reset mesh colours to original (in case intersection has been removed)
+            foreach (GameObject mesh in instantObjects.Where(x => x != null && x.name.Contains("mesh")))
+            {
+                var renderer = mesh.GetComponent<MeshRenderer>();
+                renderer.material = m_roadMaterial;
+            }
+            // Perform plane sweep to find first interesection
+            // Perform before other checks to show intersection as it happens
+            List<Edge> intersected = m_sweepline.FindIntersection(m_graph.Edges);
+            if (intersected != null)
+            {
+                // Find existing roadmesh for intersected edges and change material
+                foreach (Edge e in intersected)
+                {
+                    var roadmesh = instantObjects
+                        .Find(x => x != null && (x.name == $"mesh({e.Start}, {e.End})"
+                                                || x.name == $"mesh({e.End}, {e.Start})"));
+                    if (roadmesh != null)
+                    {
+                        var renderer = roadmesh.GetComponent<MeshRenderer>();
+                        renderer.material = m_intersectedMaterial;
+                    }
+                } 
+                return false;
+            }
+
             // Check if the number of input edges is correct.
             if (this.m_graph.EdgeCount != this.m_levels[m_levelCounter].Points.Count - 1)
             {

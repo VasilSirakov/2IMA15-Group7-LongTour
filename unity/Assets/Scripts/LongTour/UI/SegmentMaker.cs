@@ -6,6 +6,8 @@
 
     public class SegmentMaker : MonoBehaviour
     {
+        public Material m_roadMaterial;
+
         //Set pointers for two points 
         private TourPoint m_firstPoint = null;
         private TourPoint m_secondPoint = null;
@@ -20,6 +22,9 @@
         void Awake()
         {
             m_edge = GetComponent<LineRenderer>();
+            m_edge.material = m_roadMaterial;
+            m_edge.startWidth = 0.3f;
+            m_edge.endWidth = 0.3f;
             m_tourController = FindObjectOfType<TourController>();
         }
 
