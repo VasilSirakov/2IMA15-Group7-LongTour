@@ -185,6 +185,10 @@
             }
         }
 
+        /// <summary>
+        /// Checks whether the tour is valid and long enough
+        /// </summary>
+        /// <returns>true if tour is valid and long enough</returns>
         private bool CheckTour()
         {
             // Check if the number of input edges is correct.
@@ -248,6 +252,9 @@
             InitLevel();
         }
 
+        /// <summary>
+        /// Gives the heuristic solution to the problem if the player gives up
+        /// </summary>
         public void GiveUp()
         {
             Clear();
