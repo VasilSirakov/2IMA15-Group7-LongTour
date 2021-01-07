@@ -8,8 +8,8 @@
 
     public class TourPoint : MonoBehaviour
     {
-        public Vector2 Pos { get; private set; }
         public Vertex Vertex { get; private set; }
+        public Vector2 Pos { get { return Vertex.Pos; } }
 
         private SegmentMaker m_segmentMaker;
 
@@ -26,8 +26,6 @@
                 throw new InvalidProgramException("Road builder cannot be found");
             }
 
-            Pos = new Vector2(transform.position.x, transform.position.y);
-            
         }
 
         void OnMouseDown()
