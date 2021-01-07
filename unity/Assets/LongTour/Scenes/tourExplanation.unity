@@ -134,17 +134,41 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 11497240, guid: 47375d1ad9de78947b5dddba6bf6a125, type: 3}
       propertyPath: m_Text
-      value: 'Welcome,
-
-
-        Lorem ipsum dolor sit amet, consectetur adipiscing
-        elit. Nunc non sodales ex, vel interdum risus. Vivamus dapibus, eros id pretium
-        interdum, lorem massa bibendum est, in tempor tellus odio eget justo. Aenean
-        eget massa sit amet sem rhoncus dictum ac vel leo.'
+      value: "Welcome to our game!\r\nYou have been sent to a new country to be a
+        king. In order to get accustomed to your new land and gather some treasure
+        on the way you want to visit all villages in the county while seeing as much
+        of the area as possible. However, you hate seeing the same place twice and
+        love walking in a straight line. Try  to make a tour through your country
+        visiting every village exactly once and never crossing the same path! There
+        is a heuristic score you must beat in order to progress to the next level!\r\n\r\nLong
+        tour is a game using a plane sweep algorithm in order to calculate intersections
+        between the edges of the graph. In addition there\u2019s a heuristic long
+        tour algorithm that creates a long tour which is the minimal length you must
+        beat. \r\n\r\nHave fun!\r\n"
       objectReference: {fileID: 0}
     - target: {fileID: 11497240, guid: 47375d1ad9de78947b5dddba6bf6a125, type: 3}
       propertyPath: m_Maskable
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11497240, guid: 47375d1ad9de78947b5dddba6bf6a125, type: 3}
+      propertyPath: m_FontData.m_VerticalOverflow
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 11497240, guid: 47375d1ad9de78947b5dddba6bf6a125, type: 3}
+      propertyPath: m_FontData.m_BestFit
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11497240, guid: 47375d1ad9de78947b5dddba6bf6a125, type: 3}
+      propertyPath: m_FontData.m_HorizontalOverflow
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 11497240, guid: 47375d1ad9de78947b5dddba6bf6a125, type: 3}
+      propertyPath: m_FontData.m_Alignment
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 11497240, guid: 47375d1ad9de78947b5dddba6bf6a125, type: 3}
+      propertyPath: m_FontData.m_MaxSize
+      value: 80
       objectReference: {fileID: 0}
     - target: {fileID: 22454554, guid: 47375d1ad9de78947b5dddba6bf6a125, type: 3}
       propertyPath: m_AnchoredPosition.x
