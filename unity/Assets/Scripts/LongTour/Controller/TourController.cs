@@ -74,14 +74,20 @@ namespace LongTour
         /// </summary>
         public void InitLevel()
         {
+           
             // check if all levels are solved then go to endless mode
             if (m_levelCounter >= m_levels.Count)
             {
+                int amntOfPoints = m_levelCounter;
+                if (m_levelCounter >= 14)
+                {
+                    amntOfPoints = 14;
+                }
                 Camera.main.orthographicSize = 4;
 
                 var height = Camera.main.orthographicSize ;
                 var width = height * Camera.main.aspect;
-                List<Vector2> positions = InitEndlessLevelPositions(m_levelCounter, width, height);
+                List<Vector2> positions = InitEndlessLevelPositions(amntOfPoints, width, height);
                 foreach(var position in positions)
                 {
                     GameObject obj;
