@@ -59,7 +59,7 @@ namespace LongTour
         protected TourSegment[] m_segments;
 
         protected int m_levelCounter = 0;
-        private float m_pointRadius = 0.9f;
+        protected readonly float m_pointRadius = 0.6f;
 
         // Start is called before the first frame update
         void Start()
@@ -83,9 +83,9 @@ namespace LongTour
                 {
                     amntOfPoints = 14;
                 }
-                Camera.main.orthographicSize = 4;
+                Camera.main.orthographicSize = 4 * (1 + m_pointRadius );
 
-                var height = Camera.main.orthographicSize ;
+                var height = Camera.main.orthographicSize * 0.9f;
                 var width = height * Camera.main.aspect;
                 List<Vector2> positions = InitEndlessLevelPositions(amntOfPoints, width, height);
                 foreach(var position in positions)
@@ -146,7 +146,7 @@ namespace LongTour
                 var pos = new Vector2(xpos, ypos);
 
                 //don't add if too close to another point
-                if (!result.Exists(r => Vector2.Distance(r,pos) < 0.4 *  m_pointRadius))
+                if (!result.Exists(r => Vector2.Distance(r,pos) < 2 *  m_pointRadius))
                 {
                     result.Add(pos);
                 }
