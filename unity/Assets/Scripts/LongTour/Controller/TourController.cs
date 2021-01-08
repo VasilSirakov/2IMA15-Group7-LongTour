@@ -331,7 +331,7 @@ namespace LongTour
         }
 
         ///<summary>
-        ///Clears tour and relevant game objects
+        /// Clears tour and relevant game objects
         /// </summary>
         private void Clear()
         {
@@ -372,6 +372,8 @@ namespace LongTour
             }
             //remove all edges in the underlying graph
             this.m_graph.RemoveAllEdges(this.m_graph.Edges);
+
+            this.CheckSolution();
         }
 
         /// <summary>
