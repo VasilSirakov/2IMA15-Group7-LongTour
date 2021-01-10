@@ -50,13 +50,16 @@ namespace LongTour
         private List<LineSegment> heuristicTour;
         private float heuristicTourLength;
 
+
         private IntersectionSweepLine<IntersectionSweepEvent, IntersectionStatusItem> m_sweepline;
   
         //Graph info
-        protected IGraph m_graph;
+        private IGraph m_graph;
         protected TourPoint[] m_tourPoints;
+        protected TourSegment[] m_segments;
 
-        protected int m_levelCounter = 0;    
+        protected int m_levelCounter = 0;
+        protected readonly float m_pointRadius = 0.6f;
 
         // Start is called before the first frame update
         void Start()
@@ -71,31 +74,47 @@ namespace LongTour
         /// </summary>
         public void InitLevel()
         {
-            // check if all levels are solved
+           
+            // check if all levels are solved then go to endless mode
             if (m_levelCounter >= m_levels.Count)
             {
-                SceneManager.LoadScene(m_victoryScene);
-                return;
+                int amntOfPoints = m_levelCounter;
+                if (m_levelCounter >= 14)
+                {
+                    amntOfPoints = 14;
+                }
+                Camera.main.orthographicSize = 4 * (1 + m_pointRadius );
+
+                var height = Camera.main.orthographicSize * 0.9f;
+                var width = height * Camera.main.aspect;
+                List<Vector2> positions = InitEndlessLevelPositions(amntOfPoints, width, height);
+                foreach(var position in positions)
+                {
+                    GameObject obj;
+                    obj = Instantiate(m_pointPrefab, position, Quaternion.identity);
+                    obj.transform.parent = this.transform;
+                    instantObjects.Add(obj);
+                }
             }
+            else
+            {
+                //initialize points
+                foreach (var point in m_levels[m_levelCounter].Points)
+                {
+                    var obj = Instantiate(m_pointPrefab, point, Quaternion.identity);
+                    obj.transform.parent = this.transform;
+                    instantObjects.Add(obj);
+                }
+            }
+
 
             m_sweepline = new IntersectionSweepLine<IntersectionSweepEvent, IntersectionStatusItem>();
 
-            //initialize points
-            foreach (var point in m_levels[m_levelCounter].Points)
-            {
-                var obj = Instantiate(m_pointPrefab, point, Quaternion.identity);
-                obj.transform.parent = this.transform;
-                instantObjects.Add(obj);
-            }
 
             // make vertex list
             m_tourPoints = FindObjectsOfType<TourPoint>();
 
             //init empty graph
-            if (m_graph != null)
-            {
-                m_graph.Clear();
-            }
             m_graph = new AdjacencyListGraph(m_tourPoints.Select(go => go.Vertex));
 
             var vertices = m_tourPoints.Select(go => new Vertex(go.Pos));
@@ -106,6 +125,34 @@ namespace LongTour
 
             CheckSolution();
             UpdateTextField();
+        }
+
+        /// <summary>
+        /// Generates new coordinates randomly for endless levels
+        /// </summary>
+        /// <param name="count"></param>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        /// <returns></returns>
+        private List<Vector2> InitEndlessLevelPositions(int count, float width, float height)
+        {
+            var result = new List<Vector2>();
+            while (result.Count < count)
+            {
+                //find uniform random position centered around (0,0) within width and height
+                //taking into account point radius
+                var xpos = UnityEngine.Random.Range(-width / 2, width / 2 );
+                var ypos = UnityEngine.Random.Range(-height / 2, width / 2);
+                var pos = new Vector2(xpos, ypos);
+
+                //don't add if too close to another point
+                if (!result.Exists(r => Vector2.Distance(r,pos) < 2 *  m_pointRadius))
+                {
+                    result.Add(pos);
+                }
+            }
+          
+            return result;
         }
 
         /// <summary>
@@ -121,6 +168,9 @@ namespace LongTour
             m_scoreText.text = text;
         }
 
+        /// <summary>
+        /// Clears the solved level and initialize the next level
+        /// </summary>
         public void AdvanceLevel()
         {
             // increase level index
@@ -129,6 +179,11 @@ namespace LongTour
             InitLevel();
         }
 
+        /// <summary>
+        /// Add a road tour segment between 2 points
+        /// </summary>
+        /// <param name="a_point1"></param>
+        /// <param name="a_point2"></param>
         public void AddSegment(TourPoint a_point1, TourPoint a_point2)
         {
             // Dont add edge to itself or double edges
@@ -200,6 +255,7 @@ namespace LongTour
         /// <returns>true if tour is valid and long enough</returns>
         private bool CheckTour()
         {
+            bool isTourCorrect = true;
             // Reset mesh colours to original (in case intersection has been removed)
             foreach (GameObject mesh in instantObjects.Where(x => x != null && x.name.Contains("mesh")))
             {
@@ -222,20 +278,17 @@ namespace LongTour
                         var renderer = roadmesh.GetComponent<MeshRenderer>();
                         renderer.material = m_intersectedMaterial;
                     }
-                } 
-                return false;
-            }
-
-            // Check if the number of input edges is correct.
-            if (this.m_graph.EdgeCount != this.m_levels[m_levelCounter].Points.Count - 1)
-            {
-                return false;
+                }
+                isTourCorrect = false; ;
             }
 
             // Check if the degree of a vertex is either 1 or 2. 1 is when the vertex is the start point
             // or end point of the tour. 2 is for all other vertices.
-            var vertices = this.m_levels[m_levelCounter].Points
-                .Select(x => new Vertex(x));
+            var vertices = new List<Vertex>();
+            foreach( var tourPoint in m_tourPoints)
+            {
+                vertices.Add(tourPoint.Vertex);
+            }
             foreach (var vertex in vertices)
             {
                 int degreeOfVertex = 
@@ -244,7 +297,19 @@ namespace LongTour
 
                 if (degreeOfVertex == 0 || degreeOfVertex > 2)
                 {
-                    return false;
+                    var tooManyEdges = this.m_graph.EdgesOf(vertex);
+                    foreach (Edge e in tooManyEdges)
+                    {
+                        var roadmesh = instantObjects
+                            .Find(x => x != null && (x.name == $"mesh({e.Start}, {e.End})"
+                                                    || x.name == $"mesh({e.End}, {e.Start})"));
+                        if (roadmesh != null)
+                        {
+                            var renderer = roadmesh.GetComponent<MeshRenderer>();
+                            renderer.material = m_intersectedMaterial;
+                        }
+                    }
+                    isTourCorrect = false;
                 }
             }
 
@@ -252,18 +317,25 @@ namespace LongTour
             float tourWeight = this.m_graph.Edges.Sum(e => e.Length);
             if (tourWeight < heuristicTourLength)
             {
-                return false;
+                isTourCorrect = false;
+            }
+
+            // Check if the number of input edges is correct.
+            if (this.m_graph.EdgeCount != m_tourPoints.Length - 1)
+            {
+                isTourCorrect = false;
             }
 
             // All other checks have been passed. Tour is valid.
-            return true;
+            return isTourCorrect;
         }
 
         ///<summary>
-        ///Clears tour and relevant game objects
+        /// Clears tour and relevant game objects
         /// </summary>
         private void Clear()
         {
+
             //clear the graph if it exists
             if (m_graph != null) m_graph.Clear();
 
@@ -283,8 +355,25 @@ namespace LongTour
         /// </summary>
         public void ClearEdges()
         {
-            Clear();
-            InitLevel();
+            //destroy all instant objects(both the vertices and edges)
+            foreach (var obj in instantObjects)
+            {
+                // destory the objects
+                DestroyImmediate(obj);
+            }
+            instantObjects.Clear();
+
+            //Reload all the vertices into the instant objects
+            foreach (var point in m_tourPoints)
+            {
+                var obj = Instantiate(m_pointPrefab, point.Pos, Quaternion.identity);
+                obj.transform.parent = this.transform;
+                instantObjects.Add(obj);
+            }
+            //remove all edges in the underlying graph
+            this.m_graph.RemoveAllEdges(this.m_graph.Edges);
+
+            this.CheckSolution();
         }
 
         /// <summary>
@@ -292,8 +381,7 @@ namespace LongTour
         /// </summary>
         public void GiveUp()
         {
-            Clear();
-            InitLevel();
+            ClearEdges();
             foreach (var lineSegment in heuristicTour)
             {
                 Vertex endpoint1 = new Vertex(lineSegment.Point1);
